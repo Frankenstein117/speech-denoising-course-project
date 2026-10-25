@@ -77,8 +77,19 @@ def main() -> None:
     clean_dir = Path(config["clean_train_dir"])
     noisy_dir = Path(config["noisy_train_dir"])
     pairs = paired_files(clean_dir, noisy_dir)
+    split_seed = int(config.get("split_seed", config["seed"]))
     train_pairs, valid_pairs = split_by_speaker(
-        pairs, int(config["validation_speakers"]), int(config["seed"])
+        pairs, int(config["validation_speakers"]), split_seed
+    )
+    valid_speakers = sorted({clean.stem.split("_")[0] for clean, _ in valid_pairs})
+    print(
+        {
+            "total_pairs": len(pairs),
+            "train_pairs": len(train_pairs),
+            "valid_pairs": len(valid_pairs),
+            "validation_speakers": valid_speakers,
+            "split_seed": split_seed,
+        }
     )
     train_data = PairedAudioDataset(
         train_pairs, int(config["sample_rate"]), float(config["segment_seconds"]), True

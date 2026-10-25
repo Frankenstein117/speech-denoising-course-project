@@ -8,6 +8,7 @@ segment_seconds: 2.0
 clean_train_dir: data/processed/VoiceBank-DEMAND/clean_trainset_28spk_wav
 noisy_train_dir: data/processed/VoiceBank-DEMAND/noisy_trainset_28spk_wav
 validation_speakers: 2
+split_seed: 42
 batch_size: 16
 num_workers: 12
 epochs: 50
