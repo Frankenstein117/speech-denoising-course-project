@@ -3,10 +3,10 @@ set -euo pipefail
 
 if [[ "$(id -u)" -eq 0 ]]; then
   apt-get update
-  apt-get install -y python3 python3-venv git wget unzip libsndfile1
+  apt-get install -y python3 python3-venv git curl unzip libsndfile1
 else
   sudo apt-get update
-  sudo apt-get install -y python3 python3-venv git wget unzip libsndfile1
+  sudo apt-get install -y python3 python3-venv git curl unzip libsndfile1
 fi
 
 python3 - <<'PY'

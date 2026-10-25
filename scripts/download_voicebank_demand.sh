@@ -16,7 +16,9 @@ downloads=(
 for item in "${downloads[@]}"; do
   IFS='|' read -r name url <<< "$item"
   if ! unzip -tq "$raw/$name" >/dev/null 2>&1; then
-    wget -c --retry-connrefused --waitretry=5 --timeout=30 "$url" -O "$raw/$name"
+    curl --fail --location --continue-at - \
+      --retry 5 --retry-delay 5 --connect-timeout 30 \
+      --output "$raw/$name" "$url"
   fi
   unzip -tq "$raw/$name" >/dev/null
   directory="${name%.zip}"
