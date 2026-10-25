@@ -1,0 +1,51 @@
+{
+  "model": {
+    "name": "dpdfnet2_48khz_hr",
+    "runtime": "ONNX Runtime CPU",
+    "parameters_millions": 2.58,
+    "native_sample_rate_hz": 48000,
+    "attenuation_limit_db": 12,
+    "model_sha256": "7f0575a5cec0ba4ffd8f8bd657e06d007e4ccdd955d76faab922b9d3291dc14b"
+  },
+  "standard_test": {
+    "dataset": "VoiceBank+DEMAND official paired test set",
+    "paired_files": 824,
+    "sample_rate_hz": 48000,
+    "inference_seconds": 275.635,
+    "mean_metrics": {
+      "noisy": {
+        "snr_db": 8.3949,
+        "ssnr_db": 1.5353,
+        "pesq_wb": 1.9668,
+        "pesq_nb": 2.9456,
+        "stoi": 0.9211
+      },
+      "enhanced": {
+        "snr_db": 16.9152,
+        "ssnr_db": 7.8232,
+        "pesq_wb": 2.7007,
+        "pesq_nb": 3.4968,
+        "stoi": 0.9394
+      },
+      "improvement": {
+        "snr_db": 8.5203,
+        "ssnr_db": 6.2879,
+        "pesq_wb": 0.7340,
+        "pesq_nb": 0.5511,
+        "stoi": 0.0183
+      }
+    }
+  },
+  "low_snr_robustness_test": {
+    "dataset": "DPDFNet EvalSet selected 0 dB airport, car, and street mixtures",
+    "paired_files": 3,
+    "input_sample_rate_hz": 16000,
+    "mean_improvement": {
+      "snr_db": 10.1823,
+      "ssnr_db": 5.5323,
+      "pesq_wb": 0.2607,
+      "pesq_nb": 0.4885,
+      "stoi": 0.1063
+    }
+  }
+}

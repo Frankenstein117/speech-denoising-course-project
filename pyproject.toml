@@ -1,0 +1,31 @@
+[project]
+name = "speech-denoising-course-project"
+version = "0.1.0"
+description = "DPDFNet speech denoising reproduction and objective evaluation"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "matplotlib>=3.8,<4",
+  "numpy>=1.26,<3",
+  "pandas>=2.0,<4",
+  "pesq==0.0.4",
+  "pystoi>=0.4,<1",
+  "pyyaml>=6,<7",
+  "scipy>=1.11,<2",
+  "seaborn>=0.13,<1",
+  "soundfile>=0.12,<1",
+  "torch>=2.4,<3",
+  "torchaudio>=2.4,<3",
+  "tqdm>=4.66,<5",
+]
+
+[project.optional-dependencies]
+pretrained = [
+  "dpdfnet==0.6.0",
+  "espnet",
+  "fast-bss-eval>=0.1.4",
+  "librosa>=0.10",
+]
+
+[tool.ruff]
+line-length = 100
+

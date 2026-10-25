@@ -1,0 +1,8 @@
+model: dpdfnet2_48khz_hr
+model_sample_rate: 48000
+attenuation_limit_db: 12
+alignment_max_shift_ms: 250
+segment_length_ms: 30
+segment_snr_clip_db: [-10, 35]
+dataset: VoiceBank+DEMAND test set
+

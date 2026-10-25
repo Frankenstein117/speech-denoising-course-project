@@ -1,0 +1,19 @@
+model: dccrn
+model_kwargs:
+  n_fft: 512
+  hop_length: 128
+  hidden_size: 256
+sample_rate: 16000
+segment_seconds: 2.0
+clean_train_dir: data/processed/VoiceBank-DEMAND/clean_trainset_28spk_wav
+noisy_train_dir: data/processed/VoiceBank-DEMAND/noisy_trainset_28spk_wav
+validation_speakers: 2
+batch_size: 24
+num_workers: 12
+epochs: 50
+learning_rate: 0.001
+weight_decay: 0.00001
+early_stopping_patience: 8
+seed: 42
+output_dir: outputs/training/dccrn_scratch
+

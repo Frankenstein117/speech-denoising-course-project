@@ -1,0 +1,78 @@
+{
+  "dataset": "VoiceBank+DEMAND official paired test set",
+  "paired_files": 824,
+  "input_sample_rate_hz": 48000,
+  "models": {
+    "rnnoise": {
+      "listed_in_teacher_ppt": true,
+      "native_sample_rate_hz": 48000
+    },
+    "dccrn": {
+      "listed_in_teacher_ppt": true,
+      "native_sample_rate_hz": 16000,
+      "parameters": 3671053
+    },
+    "dpdfnet2": {
+      "listed_in_teacher_ppt": false,
+      "native_sample_rate_hz": 48000
+    }
+  },
+  "mean_metrics": {
+    "noisy": {
+      "snr_db": 8.3949,
+      "ssnr_db": 1.5353,
+      "pesq_wb": 1.9668,
+      "pesq_nb": 2.9456,
+      "stoi": 0.9211
+    },
+    "rnnoise": {
+      "snr_db": 12.5943,
+      "ssnr_db": 5.9782,
+      "pesq_wb": 2.1067,
+      "pesq_nb": 3.047,
+      "stoi": 0.8895
+    },
+    "dccrn": {
+      "snr_db": 14.5955,
+      "ssnr_db": 6.7916,
+      "pesq_wb": 2.6256,
+      "pesq_nb": 3.5454,
+      "stoi": 0.9349
+    },
+    "dpdfnet2": {
+      "snr_db": 16.9152,
+      "ssnr_db": 7.8232,
+      "pesq_wb": 2.7007,
+      "pesq_nb": 3.4968,
+      "stoi": 0.9394
+    }
+  },
+  "mean_improvement": {
+    "rnnoise": {
+      "snr_db": 4.1994,
+      "ssnr_db": 4.4429,
+      "pesq_wb": 0.1399,
+      "pesq_nb": 0.1013,
+      "stoi": -0.0316
+    },
+    "dccrn": {
+      "snr_db": 6.2007,
+      "ssnr_db": 5.2563,
+      "pesq_wb": 0.6589,
+      "pesq_nb": 0.5998,
+      "stoi": 0.0138
+    },
+    "dpdfnet2": {
+      "snr_db": 8.5203,
+      "ssnr_db": 6.2879,
+      "pesq_wb": 0.734,
+      "pesq_nb": 0.5511,
+      "stoi": 0.0183
+    }
+  },
+  "cpu_inference_seconds": {
+    "rnnoise": 120.806,
+    "dccrn": 184.772,
+    "dpdfnet2": 275.635
+  }
+}
