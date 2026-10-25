@@ -17,6 +17,7 @@ for item in "${downloads[@]}"; do
   IFS='|' read -r name url <<< "$item"
   if ! unzip -tq "$raw/$name" >/dev/null 2>&1; then
     curl --fail --location --continue-at - \
+      --user-agent "Mozilla/5.0" \
       --retry 5 --retry-delay 5 --connect-timeout 30 \
       --output "$raw/$name" "$url"
   fi
