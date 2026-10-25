@@ -69,8 +69,15 @@ def run_epoch(model, loader, optimizer, device, scaler, train: bool) -> float:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train a speech-denoising model from random initialization.")
     parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--resume", type=Path)
+    parser.add_argument("--epochs", type=int)
+    parser.add_argument("--early-stopping-patience", type=int)
     args = parser.parse_args()
     config = yaml.safe_load(args.config.read_text())
+    if args.epochs is not None:
+        config["epochs"] = args.epochs
+    if args.early_stopping_patience is not None:
+        config["early_stopping_patience"] = args.early_stopping_patience
     seed_everything(int(config["seed"]))
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -118,11 +125,46 @@ def main() -> None:
 
     best = float("inf")
     stale = 0
+    start_epoch = 1
     log_path = output_dir / "training_log.csv"
-    with log_path.open("w", newline="") as log_file:
+    if args.resume is not None:
+        checkpoint = torch.load(args.resume, map_location=device, weights_only=False)
+        if checkpoint["model"] != config["model"]:
+            raise ValueError(
+                f"Checkpoint model {checkpoint['model']} does not match config model {config['model']}"
+            )
+        model.load_state_dict(checkpoint["state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer"])
+        if "scheduler" in checkpoint:
+            scheduler.load_state_dict(checkpoint["scheduler"])
+        if "scaler" in checkpoint:
+            scaler.load_state_dict(checkpoint["scaler"])
+        start_epoch = int(checkpoint["epoch"]) + 1
+        best = float(checkpoint.get("best_valid_loss", checkpoint["valid_loss"]))
+        stale = int(checkpoint.get("stale_epochs", 0))
+        if log_path.exists():
+            with log_path.open(newline="") as history_file:
+                history = list(csv.DictReader(history_file))
+            if history:
+                losses = [float(row["valid_loss"]) for row in history]
+                best = min(losses)
+                best_index = max(index for index, loss in enumerate(losses) if loss == best)
+                stale = len(losses) - best_index - 1
+        print(
+            {
+                "resume_from": str(args.resume),
+                "start_epoch": start_epoch,
+                "historical_best_valid_loss": best,
+                "stale_epochs": stale,
+            }
+        )
+
+    log_mode = "a" if args.resume is not None and log_path.exists() else "w"
+    with log_path.open(log_mode, newline="") as log_file:
         writer = csv.DictWriter(log_file, fieldnames=["epoch", "train_loss", "valid_loss", "learning_rate"])
-        writer.writeheader()
-        for epoch in range(1, int(config["epochs"]) + 1):
+        if log_mode == "w":
+            writer.writeheader()
+        for epoch in range(start_epoch, int(config["epochs"]) + 1):
             train_loss = run_epoch(model, train_loader, optimizer, device, scaler, True)
             valid_loss = run_epoch(model, valid_loader, optimizer, device, scaler, False)
             scheduler.step(valid_loss)
@@ -143,17 +185,23 @@ def main() -> None:
                 "optimizer": optimizer.state_dict(),
                 "valid_loss": valid_loss,
                 "sample_rate": int(config["sample_rate"]),
+                "scheduler": scheduler.state_dict(),
+                "scaler": scaler.state_dict(),
             }
-            torch.save(checkpoint, output_dir / "last.pt")
             if valid_loss < best:
                 best = valid_loss
                 stale = 0
+                checkpoint["best_valid_loss"] = best
+                checkpoint["stale_epochs"] = stale
                 torch.save(checkpoint, output_dir / "best.pt")
             else:
                 stale += 1
-                if stale >= int(config["early_stopping_patience"]):
-                    print(f"Early stopping at epoch {epoch}; best validation loss={best:.6f}")
-                    break
+            checkpoint["best_valid_loss"] = best
+            checkpoint["stale_epochs"] = stale
+            torch.save(checkpoint, output_dir / "last.pt")
+            if stale >= int(config["early_stopping_patience"]):
+                print(f"Early stopping at epoch {epoch}; best validation loss={best:.6f}")
+                break
 
 
 if __name__ == "__main__":
