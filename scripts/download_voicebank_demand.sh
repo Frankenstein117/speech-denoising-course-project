@@ -6,20 +6,29 @@ raw="$root/data/raw"
 processed="$root/data/processed/VoiceBank-DEMAND"
 mkdir -p "$raw" "$processed"
 
-downloads=(
-  "clean_trainset_28spk_wav.zip|https://datashare.ed.ac.uk/bitstreams/245452b6-6235-44b6-a6f9-e7eb19797769/download"
-  "noisy_trainset_28spk_wav.zip|https://datashare.ed.ac.uk/bitstreams/ecb5a102-bb00-46d3-8af5-40c79823b837/download"
-  "clean_testset_wav.zip|https://datashare.ed.ac.uk/bitstreams/dec213d3-bf57-4777-9663-c24bdce92d5e/download"
-  "noisy_testset_wav.zip|https://datashare.ed.ac.uk/bitstreams/13c1bfbf-14a6-41db-9b41-8f7310f01ad5/download"
+files=(
+  clean_trainset_28spk_wav.zip
+  noisy_trainset_28spk_wav.zip
+  clean_testset_wav.zip
+  noisy_testset_wav.zip
 )
+mirror_base="${VOICEBANK_MIRROR_BASE:-https://hf-mirror.com/datasets/mrfakename/noisy-speech-files/resolve/main}"
+fallback_base="https://huggingface.co/datasets/mrfakename/noisy-speech-files/resolve/main"
 
-for item in "${downloads[@]}"; do
-  IFS='|' read -r name url <<< "$item"
+download() {
+  local url="$1"
+  local destination="$2"
+  curl --fail --location --continue-at - \
+    --retry 5 --retry-delay 5 --connect-timeout 30 \
+    --output "$destination" "$url"
+}
+
+for name in "${files[@]}"; do
   if ! unzip -tq "$raw/$name" >/dev/null 2>&1; then
-    curl --fail --location --continue-at - \
-      --user-agent "Mozilla/5.0" \
-      --retry 5 --retry-delay 5 --connect-timeout 30 \
-      --output "$raw/$name" "$url"
+    if ! download "$mirror_base/$name?download=true" "$raw/$name"; then
+      echo "Mirror failed; retrying from Hugging Face."
+      download "$fallback_base/$name?download=true" "$raw/$name"
+    fi
   fi
   unzip -tq "$raw/$name" >/dev/null
   directory="${name%.zip}"
